@@ -1365,7 +1365,7 @@ ESTADO ACTUAL:
             // Build summary HTML
             return `
                 <div class="summary-box">
-                    <h4>📋 Resumen de Servicios Seleccionados</h4>
+                    <h4>Resumen de Servicios Seleccionados</h4>
                     <ul>
                         ${selectedServices.map(name => `
                             <li>${name} - ${services[name].price}</li>
@@ -1466,7 +1466,7 @@ ESTADO ACTUAL:
         function initChat() {
             setTimeout(() => {
                 // First welcome message
-                addMessage('¡Bienvenido a Offensive Core! 👋', true);
+                addMessage('¡Bienvenido a Offensive Core! ', true);
                 
                 setTimeout(() => {
                     // Company introduction
@@ -1496,7 +1496,7 @@ ESTADO ACTUAL:
         function showCertifications() {
             const certHTML = `
                 <div class="summary-box">
-                    <h4>🏆 Nuestras Certificaciones</h4>
+                    <h4>Nuestras Certificaciones</h4>
                     <ul>
                         <li>OSCP - Offensive Security Certified Professional</li>
                         <li>OSWE - Offensive Security Web Expert</li>
@@ -1560,4 +1560,5 @@ ESTADO ACTUAL:
         };
     </script>
 </body>
+
 </html>
