@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- ==================================================================================
+         META TAGS & DOCUMENT CONFIGURATION
+         ================================================================================== -->
+    
+    <!-- Character encoding set to UTF-8 to support special characters and international symbols -->
+    <meta charset="UTF-8">
+    
+    <!-- Viewport configuration for responsive design across all device sizes
+         - width=device-width: Sets viewport width to match device screen width
+         - initial-scale=1.0: Sets initial zoom level to 100% -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Page title displayed in browser tab and bookmarks -->
+    <title>Offensive Core | Ciberseguridad Ofensiva</title>
+    
+    <!-- ==================================================================================
+         EXTERNAL RESOURCE PRELOADING
+         ================================================================================== -->
+    
+    <!-- Preconnect to Google Fonts CDN to reduce DNS lookup time
+         This improves performance by establishing early connection to font servers -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Favicon configuration - displays brand icon in browser tab -->
+    <link rel="icon" href="Imagen/Offensive_Core.png" type="image/png">
+    
+    <!-- Google Fonts import - Loading two custom typefaces:
+         - JetBrains Mono: Monospace font for code-like aesthetic (weights: 400, 700)
+         - Orbitron: Futuristic display font for headers (weights: 700, 900)
+         display=swap: Ensures text remains visible during font loading -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==============================================================================
+           CSS CUSTOM PROPERTIES (CSS VARIABLES)
+           ==============================================================================
+           
+           Purpose: Centralized color palette and theme management
+           Benefits:
+           - Easy theme maintenance and updates
+           - Consistent color usage across entire application
+           - Single source of truth for design tokens
+           - Facilitates future dark/light theme switching
+           ============================================================================== */
+        
+        :root {
+            /* Primary Brand Colors */
+            --primary: #00ff41;        /* Neon green - Primary brand color, used for CTAs and emphasis */
+            --secondary: #0dff92;      /* Aqua green - Secondary accent, complements primary */
+            --accent: #ff0055;         /* Hot pink/red - Accent color for gradients and special highlights */
+            
+            /* Background Colors */
+            --dark: #0a0e27;           /* Dark blue - Primary background color */
+            --darker: #050711;         /* Darker blue - Deepest background shade for contrast */
+            
+            /* Text Colors */
+            --text: #e0e0e0;           /* Light gray - Primary text color for optimal readability */
+            
+            /* Effect Colors */
+            --glow: rgba(0, 255, 65, 0.5); /* Semi-transparent green - Used for glow/shadow effects */
+        }
+
+        /* ==============================================================================
+           GLOBAL RESET & BASE STYLES
+           ==============================================================================
+           
+           Purpose: Normalize browser defaults and establish consistent base styling
+           
+           The universal selector (*) resets common properties to prevent
+           inconsistent spacing and box model calculations across browsers
+           ============================================================================== */
+        
+        * {
+            margin: 0;              /* Removes default margins from all elements */
+            padding: 0;             /* Removes default padding from all elements */
+            box-sizing: border-box; /* Includes padding and border in element's total width/height
+                                       This prevents unexpected size changes when adding borders/padding */
+        }
+
+        body {
+            /* Typography */
+            font-family: 'JetBrains Mono', monospace; /* Monospace font creates technical/hacker aesthetic */
+            line-height: 1.6;            /* Optimal line height for readability (1.5-1.8 is recommended) */
+            
+            /* Colors */
+            background: var(--darker);    /* Darkest background for maximum contrast */
+            color: var(--text);          /* Default text color applied to all text */
+            
+            /* Layout */
+            overflow-x: hidden;          /* Prevents horizontal scrollbar from appearing
+                                            Important for animations that might extend beyond viewport */
+        }
+
+        /* ==============================================================================
+           ANIMATED GRID BACKGROUND
+           ==============================================================================
+           
+           Purpose: Creates an animated cyberpunk-style grid background effect
+           
+           Technical Details:
+           - Uses CSS gradients to create a grid pattern
+           - Fixed positioning keeps it behind all content
+           - Continuously animates diagonally using CSS transforms
+           - Pointer-events: none allows clicks to pass through to content below
+           ============================================================================== */
+        
+        .grid-bg {
+            /* Positioning */
+            position: fixed;    /* Fixed to viewport - doesn't move with page scroll */
+            top: 0;
+            left: 0;
+            width: 100%;        /* Full viewport width */
+            height: 100%;       /* Full viewport height */
+            
+            /* Grid Pattern Creation using Linear Gradients
+               - First gradient: Vertical lines (90deg)
+               - Second gradient: Horizontal lines (0deg)
+               - Each line is 1px wide with semi-transparent green color
+               - Transparent between lines creates grid effect */
+            background: 
+                linear-gradient(90deg, rgba(0,255,65,0.03) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0,255,65,0.03) 1px, transparent 1px);
+            
+            background-size: 50px 50px; /* Sets grid cell size to 50x50 pixels */
+            
+            /* Animation */
+            animation: gridMove 20s linear infinite; /* Continuous 20-second diagonal movement */
+            
+            /* Interaction */
+            pointer-events: none; /* Allows mouse clicks to pass through to elements below */
+            
+            /* Stacking */
+            z-index: 0;          /* Lowest z-index - ensures it stays behind all content */
+        }
+
+        /**
+         * ANIMATION: Grid Movement
+         * 
+         * Creates a continuous diagonal scrolling effect
+         * Movement distance matches grid cell size (50px) for seamless looping
+         * 
+         * @keyframes gridMove
+         * @param {transform} translate - Moves element diagonally
+         * @duration 20s - Full cycle takes 20 seconds
+         * @timing linear - Constant speed throughout animation
+         * @iteration infinite - Loops continuously
+         */
+        @keyframes gridMove {
+            0% { 
+                transform: translate(0, 0);      /* Starting position - top left */
+            }
+            100% { 
+                transform: translate(50px, 50px); /* End position - one grid cell diagonal
+                                                     Matches grid size for seamless loop */
+            }
+        }
+
+        /* ==============================================================================
+           SCANLINE EFFECT (CRT Monitor Simulation)
+           ==============================================================================
+           
+           Purpose: Simulates old CRT monitor scanlines for retro-futuristic aesthetic
+           
+           Technical Implementation:
+           - Creates horizontal lines using gradient
+           - Animates vertically to simulate scanning effect
+           - Very subtle opacity (0.02) to not interfere with readability
+           ============================================================================== */
+        
+        .scanline {
+            /* Positioning */
+            position: fixed;    /* Fixed to viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            
+            /* Scanline Pattern Creation
+               Creates alternating transparent and semi-transparent horizontal stripes */
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,              /* First half of each line is transparent */
+                rgba(0, 255, 65, 0.02) 50%   /* Second half has subtle green tint */
+            );
+            
+            background-size: 100% 4px; /* Each scanline is 4px tall */
+            
+            /* Animation */
+            animation: scan 8s linear infinite; /* Continuous 8-second vertical scan */
+            
+            /* Interaction */
+            pointer-events: none; /* Allows interaction with content below */
+            
+            /* Stacking */
+            z-index: 1;          /* Above grid background but below main content */
+        }
+
+        /**
+         * ANIMATION: Scanline Movement
+         * 
+         * Simulates CRT monitor electron beam scanning from top to bottom
+         * Creates classic retro computer terminal effect
+         * 
+         * @keyframes scan
+         * @param {transform} translateY - Vertical movement
+         * @duration 8s - Complete scan takes 8 seconds
+         * @timing linear - Constant scanning speed
+         * @iteration infinite - Continuous scanning
+         */
+        @keyframes scan {
+            0% { 
+                transform: translateY(0);      /* Starts at top of screen */
+            }
+            100% { 
+                transform: translateY(100vh);  /* Moves to bottom of viewport
+                                                  100vh = 100% of viewport height */
+            }
+        }
+
+        /* ==============================================================================
+           MAIN CONTENT CONTAINER
+           ==============================================================================
+           
+           Purpose: Centers and constrains content width for optimal readability
+           
+           Container Pattern Benefits:
+           - Prevents text from becoming too wide on large screens
+           - Maintains consistent margins on all screen sizes
+           - Provides predictable layout structure
+           ============================================================================== */
+        
+        .container {
+            max-width: 1400px;      /* Maximum width prevents overly long text lines
+                                       Optimal reading width is 60-80 characters per line */
+            margin: 0 auto;         /* Centers container horizontally
+                                       0 = top/bottom margin, auto = left/right margin */
+            padding: 0 2rem;        /* Horizontal padding prevents content from touching edges
+                                       2rem = 32px on most browsers (16px * 2) */
+            position: relative;     /* Creates positioning context for absolutely positioned children */
+            z-index: 2;            /* Ensures content appears above background effects */
+        }
+
+        /* ==============================================================================
+           HEADER COMPONENT
+           ==============================================================================
+           
+           Purpose: Top navigation bar with sticky positioning
+           
+           Features:
+           - Sticky positioning keeps header visible during scroll
+           - Backdrop blur creates modern glassmorphism effect
+           - Border and glow effects align with cyberpunk aesthetic
+           - Slide-down entrance animation for polished feel
+           ============================================================================== */
+        
+        header {
+            /* Spacing */
+            padding: 2rem 0;       /* Vertical padding (top and bottom) */
+            
+            /* Visual Effects */
+            border-bottom: 2px solid var(--primary); /* Bottom border with brand color */
+            box-shadow: 0 0 20px var(--glow);       /* Glowing shadow effect */
+            background: rgba(10, 14, 39, 0.8);      /* Semi-transparent background
+                                                       Allows subtle visibility of content behind */
+            backdrop-filter: blur(10px);            /* Blurs content behind header
+                                                       Creates modern glassmorphism effect */
+            
+            /* Positioning */
+            position: sticky;      /* Sticks to top when scrolling
+                                      Difference from fixed: Scrolls normally until reaching top */
+            top: 0;               /* Distance from top of viewport when stuck */
+            
+            /* Stacking */
+            z-index: 100;         /* High z-index ensures header stays above all other content */
+            
+            /* Animation */
+            animation: slideDown 0.8s ease-out; /* Entrance animation on page load */
+        }
+
+        /**
+         * ANIMATION: Header Slide Down
+         * 
+         * Creates smooth entrance effect when page loads
+         * Header slides in from above viewport
+         * 
+         * @keyframes slideDown
+         * @param {transform} translateY - Vertical movement
+         * @param {opacity} - Fades in simultaneously with slide
+         * @duration 0.8s - Animation takes 0.8 seconds
+         * @timing ease-out - Starts fast, slows down at end (natural movement)
+         */
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%); /* Starts completely above viewport
+                                                -100% = full height of element upward */
+                opacity: 0;                   /* Fully transparent at start */
+            }
+            to {
+                transform: translateY(0);     /* Ends at normal position */
+                opacity: 1;                   /* Fully opaque at end */
+            }
+        }
+
+        /* ==============================================================================
+           NAVIGATION COMPONENT
+           ==============================================================================
+           
+           Purpose: Main navigation layout using Flexbox
+           
+           Flexbox Benefits:
+           - Automatically distributes space between logo and menu
+           - Easy vertical alignment
+           - Responsive without media queries (to a point)
+           ============================================================================== */
+        
+        nav {
+            display: flex;              /* Enables flexbox layout */
+            justify-content: space-between; /* Pushes logo left and menu right
+                                              Maximum space between items */
+            align-items: center;        /* Vertically centers items
+                                          Ensures logo and menu are aligned regardless of height */
+        }
+
+        /* ==============================================================================
+           LOGO STYLING
+           ==============================================================================
+           
+           Purpose: Brand identity with animated glow effect
+           
+           Typography Choices:
+           - Orbitron: Geometric sans-serif with futuristic feel
+           - Heavy weight (900): Maximum visual impact
+           - Increased letter-spacing: Enhances readability at large size
+           ============================================================================== */
+        
+        .logo {
+            /* Typography */
+            font-family: 'Orbitron', sans-serif; /* Futuristic display font */
+            font-size: 2rem;           /* Large size for brand prominence (32px) */
+            font-weight: 900;          /* Heaviest weight available for bold impact */
+            letter-spacing: 2px;       /* Adds space between letters for modern look */
+            
+            /* Color */
+            color: var(--primary);     /* Brand green color */
+            
+            /* Effects */
+            text-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow); 
+            /* Double text shadow creates layered glow effect:
+               - First shadow: 20px blur radius
+               - Second shadow: 40px blur radius for extended glow */
+            
+            /* Animation */
+            animation: glowPulse 2s ease-in-out infinite; /* Continuous pulsing glow */
+        }
+
+        /**
+         * ANIMATION: Glow Pulse
+         * 
+         * Creates breathing effect on logo glow
+         * Alternates between two shadow intensities
+         * 
+         * @keyframes glowPulse
+         * @param {text-shadow} - Varies shadow intensity
+         * @duration 2s - Full pulse cycle takes 2 seconds
+         * @timing ease-in-out - Smooth acceleration and deceleration
+         * @iteration infinite - Continuous pulsing
+         */
+        @keyframes glowPulse {
+            0%, 100% { 
+                text-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow); 
+                /* Normal intensity at start and end */
+            }
+            50% { 
+                text-shadow: 0 0 30px var(--glow), 0 0 60px var(--glow); 
+                /* Increased intensity at midpoint
+                   50% larger blur radius creates noticeable pulse */
+            }
+        }
+
+        /* ==============================================================================
+           NAVIGATION LINKS LIST
+           ==============================================================================
+           
+           Purpose: Horizontal menu layout
+           
+           Implementation:
+           - Flexbox creates horizontal layout from vertical list structure
+           - Gap property provides consistent spacing (modern alternative to margins)
+           ============================================================================== */
+        
+        .nav-links {
+            display: flex;      /* Horizontal layout for list items */
+            gap: 2.5rem;       /* Space between menu items (40px)
+                                 Gap is cleaner than margins - no first/last child issues */
+            list-style: none;  /* Removes default bullet points from unordered list */
+        }
+
+        /* ==============================================================================
+           NAVIGATION LINK STYLING
+           ==============================================================================
+           
+           Purpose: Interactive menu links with hover effects
+           
+           Features:
+           - Terminal-style prompt (">") appears on hover
+           - Smooth color transition
+           - Uppercase text for consistent visual weight
+           ============================================================================== */
+        
+        .nav-links a {
+            /* Typography */
+            font-weight: 700;          /* Bold text for emphasis */
+            text-transform: uppercase; /* All caps for uniform appearance */
+            font-size: 0.9rem;        /* Slightly smaller than body text (14.4px) */
+            letter-spacing: 1px;       /* Subtle letter spacing improves readability in uppercase */
+            
+            /* Colors */
+            color: var(--text);        /* Default gray color */
+            
+            /* Reset */
+            text-decoration: none;     /* Removes default underline from links */
+            
+            /* Positioning */
+            position: relative;        /* Creates positioning context for ::before pseudo-element */
+            
+            /* Transitions */
+            transition: color 0.3s;    /* Smooth color change on hover (300ms) */
+        }
+
+        /**
+         * PSEUDO-ELEMENT: Navigation Link Prefix
+         * 
+         * Creates terminal-style prompt that appears before link text on hover
+         * Uses CSS ::before pseudo-element to avoid extra HTML markup
+         * 
+         * Benefits:
+         * - No additional HTML needed
+         * - Animated appearance/disappearance
+         * - Reinforces terminal/hacker aesthetic
+         */
+        .nav-links a::before {
+            content: '> ';             /* Terminal prompt character with space */
+            color: var(--primary);     /* Brand green color */
+            opacity: 0;                /* Hidden by default */
+            transition: opacity 0.3s;  /* Smooth fade in/out transition */
+        }
+
+        /**
+         * INTERACTION STATE: Link Hover
+         * 
+         * Changes link color to brand color when user hovers
+         * Provides immediate visual feedback
+         */
+        .nav-links a:hover {
+            color: var(--primary);     /* Changes text to brand green */
+        }
+
+        /**
+         * INTERACTION STATE: Prefix Hover
+         * 
+         * Makes terminal prompt visible when hovering over link
+         * Creates cohesive hover effect with color change
+         */
+        .nav-links a:hover::before {
+            opacity: 1;                /* Fades in terminal prompt */
+        }
+
+        /* ==============================================================================
+           HERO SECTION
+           ==============================================================================
+           
+           Purpose: Main landing section with primary call-to-action
+           
+           Design Philosophy:
+           - Full-screen height creates immediate impact
+           - Flexbox centers content vertically
+           - Large typography establishes hierarchy
+           - Staggered animations create polished entrance
+           ============================================================================== */
+        
+        .hero {
+            min-height: 90vh;      /* 90% of viewport height
+                                     Leaves space for navigation while feeling full-screen */
+            display: flex;         /* Enables flexbox for vertical centering */
+            align-items: center;   /* Vertically centers content */
+            position: relative;    /* Creates positioning context for potential absolute children */
+            overflow: hidden;      /* Prevents horizontal scroll from animations */
+        }
+
+        /* ==============================================================================
+           HERO CONTENT CONTAINER
+           ==============================================================================
+           
+           Purpose: Constrains hero text width for optimal readability
+           
+           Max-width Rationale:
+           - 800px prevents excessively long text lines
+           - Research shows optimal reading is 50-75 characters per line
+           ============================================================================== */
+        
+        .hero-content {
+            max-width: 800px;      /* Constrains text width for readability */
+            animation: fadeInUp 1s ease-out 0.3s both; 
+            /* Entrance animation:
+               - 1s duration
+               - ease-out timing (starts fast, ends slow)
+               - 0.3s delay (allows background to settle first)
+               - both (applies both forwards and backwards fill modes) */
+        }
+
+        /**
+         * ANIMATION: Fade In Up
+         * 
+         * Universal entrance animation used throughout site
+         * Combines vertical movement with opacity change
+         * Creates professional, polished feel
+         * 
+         * @keyframes fadeInUp
+         * @param {opacity} - Fades from invisible to visible
+         * @param {transform} translateY - Moves upward
+         * @duration varies - Typically 0.8s - 1s
+         * @timing ease-out - Natural deceleration
+         * 
+         * Used for: Hero content, service cards, statistics
+         */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;                    /* Starts invisible */
+                transform: translateY(40px);   /* Starts 40px below final position
+                                                 Subtle movement prevents jarring effect */
+            }
+            to {
+                opacity: 1;                    /* Ends fully visible */
+                transform: translateY(0);      /* Ends at natural position */
+            }
+        }
+
+        /* ==============================================================================
+           HERO HEADLINE
+           ==============================================================================
+           
+           Purpose: Primary headline with maximum visual impact
+           
+           Typography Hierarchy:
+           - Largest text on page establishes clear hierarchy
+           - Heavy weight (900) creates strong presence
+           - Tight line-height accommodates multiple lines
+           - Glow effect reinforces cyberpunk aesthetic
+           ============================================================================== */
+        
+        .hero h1 {
+            /* Typography */
+            font-family: 'Orbitron', sans-serif; /* Futuristic display font */
+            font-size: 4.5rem;         /* Very large size (72px) for maximum impact */
+            font-weight: 900;          /* Heaviest weight for bold statement */
+            line-height: 1.1;          /* Tight line height (1.1 × font size)
+                                         Prevents excessive space between lines */
+            
+            /* Spacing */
+            margin-bottom: 1.5rem;     /* Space before next element (24px) */
+            
+            /* Color & Effects */
+            color: var(--primary);     /* Brand green color */
+            text-shadow: 0 0 30px var(--glow); /* Glowing halo effect */
+            
+            /* Animation */
+            animation: fadeInUp 1s ease-out 0.5s both; 
+            /* Delayed more than container (0.5s vs 0.3s)
+               Creates staggered entrance effect */
+        }
+
+        /* ==============================================================================
+           TERMINAL TEXT ELEMENT
+           ==============================================================================
+           
+           Purpose: Simulates command-line interface text
+           
+           Design Details:
+           - Pseudo-element adds terminal prompt ($)
+           - Secondary brand color differentiates from main headline
+           - Medium size bridges gap between headline and body text
+           ============================================================================== */
+        
+        .terminal-text {
+            /* Typography */
+            font-size: 1.5rem;         /* Medium-large size (24px) */
+            font-weight: 400;          /* Normal weight for contrast with bold headline */
+            
+            /* Color */
+            color: var(--secondary);   /* Aqua green - distinct from primary */
+            
+            /* Spacing */
+            margin-bottom: 2rem;       /* Space before next element (32px) */
+            
+            /* Animation */
+            animation: fadeInUp 1s ease-out 0.7s both; 
+            /* Further delayed (0.7s) continues staggered effect */
+        }
+
+        /**
+         * PSEUDO-ELEMENT: Terminal Prompt
+         * 
+         * Adds command-line prompt symbol before text
+         * Reinforces terminal/developer aesthetic
+         * 
+         * Implementation:
+         * - Uses ::before to avoid extra HTML
+         * - Different color creates visual hierarchy
+         */
+        .terminal-text::before {
+            content: '$ ';             /* Dollar sign prompt with space */
+            color: var(--primary);     /* Primary brand color for emphasis */
+        }
+
+        /* ==============================================================================
+           HERO DESCRIPTION PARAGRAPH
+           ==============================================================================
+           
+           Purpose: Provides context and value proposition
+           
+           Readability Optimization:
+           - Larger font size (1.2rem) improves readability
+           - Generous line-height (1.8) prevents cramped text
+           - Ample margin provides breathing room
+           ============================================================================== */
+        
+        .hero p {
+            /* Typography */
+            font-size: 1.2rem;         /* Slightly larger than body text (19.2px) */
+            line-height: 1.8;          /* Generous line height for comfortable reading */
+            
+            /* Color */
+            color: var(--text);        /* Standard text color */
+            
+            /* Spacing */
+            margin-bottom: 3rem;       /* Large margin before CTA button (48px) */
+            
+            /* Animation */
+            animation: fadeInUp 1s ease-out 0.9s both; 
+            /* Delayed to 0.9s - second-to-last element in sequence */
+        }
+
+        /* ==============================================================================
+           CALL-TO-ACTION BUTTON
+           ==============================================================================
+           
+           Purpose: Primary conversion element with hover effect
+           
+           Design Pattern: Outlined button with fill-on-hover
+           Benefits:
+           - Outlined style is less aggressive initially
+           - Fill animation provides satisfying interaction
+           - High contrast on hover draws attention
+           
+           Technical Implementation:
+           - Pseudo-element creates fill background
+           - Transform and transition create smooth effect
+           - Box-shadow adds depth and glow
+           ============================================================================== */
+        
+        .cta-button {
+            /* Display */
+            display: inline-block;     /* Allows padding/margins while staying inline with text */
+            
+            /* Spacing */
+            padding: 1.2rem 3rem;      /* Generous padding creates large click target
+                                         Vertical: 19.2px, Horizontal: 48px */
+            
+            /* Colors */
+            background: transparent;   /* No background initially (outlined style) */
+            color: var(--primary);     /* Green text matches border */
+            border: 2px solid var(--primary); /* Green border defines button shape */
+            
+            /* Typography */
+            font-weight: 700;          /* Bold text for emphasis */
+            text-transform: uppercase; /* All caps creates strong visual presence */
+            letter-spacing: 2px;       /* Wide letter spacing improves readability */
+            text-decoration: none;     /* Removes underline (this is a link) */
+            
+            /* Effects */
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3); /* Subtle glow effect */
+            
+            /* Positioning */
+            position: relative;        /* Creates context for ::before pseudo-element */
+            overflow: hidden;          /* Hides fill animation when off-screen */
+            
+            /* Transitions */
+            transition: all 0.3s;      /* Smooth transition for all properties */
+            
+            /* Animation */
+            animation: fadeInUp 1s ease-out 1.1s both; 
+            /* Final element in sequence (1.1s delay) */
+        }
+
+        /**
+         * PSEUDO-ELEMENT: Button Fill Background
+         * 
+         * Creates sliding fill effect on hover
+         * 
+         * Implementation Details:
+         * - Positioned absolutely relative to button
+         * - Starts off-screen to the left (left: -100%)
+         * - Slides right to fill button on hover
+         * - Z-index: -1 keeps it behind button text
+         */
+        .cta-button::before {
+            content: '';               /* Empty content required for pseudo-element */
+            position: absolute;        /* Positioned relative to .cta-button */
+            top: 0;
+            left: -100%;              /* Starts completely off-screen to left
+                                        -100% = full width of button */
+            width: 100%;
+            height: 100%;
+            background: var(--primary); /* Green fill color */
+            transition: left 0.3s;     /* Animates horizontal position */
+            z-index: -1;              /* Behind text but above button background */
+        }
+
+        /**
+         * INTERACTION STATE: Button Hover
+         * 
+         * Changes appearance when user hovers over button
+         * High contrast ensures visibility and draws attention
+         */
+        .cta-button:hover {
+            color: var(--darker);      /* Dark text for contrast against green background */
+            box-shadow: 0 0 40px var(--glow); /* Intensified glow effect */
+        }
+
+        /**
+         * INTERACTION STATE: Fill Animation Trigger
+         * 
+         * Slides green fill from left to right on hover
+         * Creates engaging, modern interaction
+         */
+        .cta-button:hover::before {
+            left: 0;                   /* Moves fill to cover entire button
+                                         Combined with transition creates slide effect */
+        }
+
+        /* ==============================================================================
+           SERVICES SECTION
+           ==============================================================================
+           
+           Purpose: Displays company service offerings in grid layout
+           
+           Layout Strategy:
+           - Large vertical padding creates clear section separation
+           - Gradient background adds visual interest
+           - Grid layout automatically responsive
+           ============================================================================== */
+        
+        .services {
+            /* Spacing */
+            padding: 8rem 0;          /* Large vertical padding (128px top/bottom)
+                                        Creates strong visual separation between sections */
+            
+            /* Background */
+            background: linear-gradient(180deg, var(--darker) 0%, var(--dark) 100%); 
+            /* Vertical gradient from darker to lighter:
+               - 180deg: Top to bottom
+               - Creates subtle depth
+               - Directs eye downward through content */
+        }
+
+        /* ==============================================================================
+           SECTION TITLE
+           ==============================================================================
+           
+           Purpose: Reusable heading style for major sections
+           
+           Design Choices:
+           - Centered alignment draws focus
+           - Large size establishes hierarchy
+           - Heavy weight creates visual anchor
+           - Comment syntax ("//") reinforces developer theme
+           ============================================================================== */
+        
+        .section-title {
+            /* Typography */
+            font-family: 'Orbitron', sans-serif; /* Display font for headings */
+            font-size: 3rem;           /* Large size (48px) */
+            font-weight: 900;          /* Maximum weight for impact */
+            text-transform: uppercase; /* All caps for visual consistency */
+            letter-spacing: 3px;       /* Wide spacing improves readability at large size */
+            
+            /* Color */
+            color: var(--primary);     /* Brand green color */
+            
+            /* Layout */
+            text-align: center;        /* Centered alignment */
+            
+            /* Spacing */
+            margin-bottom: 4rem;       /* Large space before content (64px) */
+        }
+
+        /* ==============================================================================
+           SERVICES GRID LAYOUT
+           ==============================================================================
+           
+           Purpose: Responsive grid for service cards
+           
+           CSS Grid Benefits:
+           - Automatic responsive behavior with auto-fit
+           - Equal-width columns
+           - Consistent gaps
+           - No media queries needed for basic responsiveness
+           
+           Grid Formula Explained:
+           repeat(auto-fit, minmax(350px, 1fr))
+           - auto-fit: Creates as many columns as fit in container
+           - minmax(350px, 1fr): Each column is minimum 350px, maximum 1 fraction
+           - Result: Automatically wraps to new rows when space is limited
+           ============================================================================== */
+        
+        .services-grid {
+            display: grid;             /* Enables CSS Grid layout */
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            /* Responsive columns:
+               - Minimum width: 350px (prevents cards from getting too narrow)
+               - Maximum width: 1fr (equal distribution of available space)
+               - auto-fit: Creates columns automatically based on available width */
+            gap: 2.5rem;              /* Space between grid items (40px) */
+        }
+
+        /* ==============================================================================
+           SERVICE CARD COMPONENT
+           ==============================================================================
+           
+           Purpose: Individual service card with hover effects
+           
+           Advanced Features:
+           - Glassmorphism effect (semi-transparent background + blur)
+           - Animated gradient border on hover
+           - Lift effect (translateY) on hover
+           - Layered glow shadow
+           
+           Performance Note:
+           - Backdrop-filter can be GPU-intensive
+           - Used sparingly for maximum effect
+           ============================================================================== */
+        
+        .service-card {
+            /* Background */
+            background: rgba(10, 14, 39, 0.6); /* Semi-transparent background
+                                                 Allows subtle visibility of background */
+            backdrop-filter: blur(10px);       /* Blurs content behind card
+                                                 Creates glassmorphism effect */
+            
+            /* Border */
+            border: 2px solid var(--primary); /* Green border defines card edges */
+            
+            /* Spacing */
+            padding: 2.5rem;           /* Internal spacing (40px all sides) */
+            
+            /* Positioning */
+            position: relative;        /* Creates context for ::before pseudo-element */
+            overflow: hidden;          /* Hides animated border when off-screen */
+            
+            /* Transitions */
+            transition: all 0.3s;      /* Smooth transition for all animated properties */
+        }
+
+        /**
+         * PSEUDO-ELEMENT: Animated Gradient Border
+         * 
+         * Creates multi-color gradient border that appears on hover
+         * 
+         * Technical Implementation:
+         * - Absolutely positioned to cover entire card + borders
+         * - Negative positioning (-2px) aligns with card borders
+         * - Gradient uses three brand colors
+         * - Z-index: -1 keeps it behind card content
+         * - Initially invisible (opacity: 0)
+         */
+        .service-card::before {
+            content: '';               /* Required for pseudo-element */
+            position: absolute;        /* Positioned relative to .service-card */
+            
+            /* Positioning covers card plus border width */
+            top: -2px;                /* Extends 2px above card (border width) */
+            left: -2px;               /* Extends 2px left of card */
+            right: -2px;              /* Extends 2px right of card */
+            bottom: -2px;             /* Extends 2px below card */
+            
+            /* Gradient Background */
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
+            /* 45-degree diagonal gradient:
+               - Primary green → Secondary aqua → Accent pink
+               - Creates dynamic, eye-catching effect */
+            
+            /* Stacking */
+            z-index: -1;              /* Behind card content but above background */
+            
+            /* Visibility */
+            opacity: 0;               /* Hidden by default */
+            transition: opacity 0.3s; /* Smooth fade in/out */
+        }
+
+        /**
+         * INTERACTION STATE: Card Hover Lift Effect
+         * 
+         * Elevates card when user hovers
+         * Creates depth and interactivity
+         */
+        .service-card:hover {
+            transform: translateY(-10px); /* Moves card up 10px
+                                            Negative Y = upward movement */
+            box-shadow: 0 20px 60px rgba(0, 255, 65, 0.3); 
+            /* Large, soft shadow creates floating effect:
+               - 20px vertical offset (shadow below card)
+               - 60px blur radius (very soft)
+               - Green tint matches brand */
+        }
+
+        /**
+         * INTERACTION STATE: Animated Border Reveal
+         * 
+         * Makes gradient border visible on hover
+         * Works in conjunction with lift effect
+         */
+        .service-card:hover::before {
+            opacity: 1;                /* Fades in gradient border */
+        }
+
+        /* ==============================================================================
+           SERVICE ICON (Currently Unused)
+           ==============================================================================
+           
+           Purpose: Style for future icon implementation
+           
+           Note: HTML doesn't currently include icons
+           This style is prepared for future enhancement
+           ============================================================================== */
+        
+        .service-icon {
+            font-size: 3rem;           /* Large icon size (48px) */
+            color: var(--primary);     /* Brand green color */
+            margin-bottom: 1.5rem;     /* Space below icon (24px) */
+        }
+
+        /* ==============================================================================
+           SERVICE CARD HEADING
+           ==============================================================================
+           
+           Purpose: Title for each service
+           
+           Design Rationale:
+           - Display font reinforces futuristic theme
+           - Brand color creates visual hierarchy
+           - Uppercase maintains consistency with other headings
+           ============================================================================== */
+        
+        .service-card h3 {
+            /* Typography */
+            font-family: 'Orbitron', sans-serif; /* Display font for emphasis */
+            font-size: 1.5rem;         /* Medium-large size (24px) */
+            text-transform: uppercase; /* All caps for consistency */
+            
+            /* Color */
+            color: var(--primary);     /* Brand green */
+            
+            /* Spacing */
+            margin-bottom: 1rem;       /* Space before description (16px) */
+        }
+
+        /* ==============================================================================
+           SERVICE CARD DESCRIPTION
+           ==============================================================================
+           
+           Purpose: Detailed service description text
+           
+           Readability:
+           - Standard text color ensures readability
+           - Generous line-height prevents cramped text
+           ============================================================================== */
+        
+        .service-card p {
+            color: var(--text);        /* Standard light gray text */
+            line-height: 1.8;          /* Generous spacing between lines */
+        }
+
+        /* ==============================================================================
+           STATISTICS SECTION
+           ==============================================================================
+           
+           Purpose: Displays key metrics and achievements
+           
+           Design Philosophy:
+           - Simple background lets numbers stand out
+           - Large padding creates breathing room
+           - Grid layout ensures consistent presentation
+           ============================================================================== */
+        
+        .stats {
+            padding: 6rem 0;          /* Vertical padding (96px top/bottom) */
+            background: var(--dark);  /* Solid dark background */
+        }
+
+        /* ==============================================================================
+           STATISTICS GRID LAYOUT
+           ==============================================================================
+           
+           Purpose: Responsive grid for statistics display
+           
+           Layout Pattern:
+           - Similar to services grid but smaller minimum width
+           - Centered text creates clean, organized appearance
+           - Larger gap provides visual separation
+           ============================================================================== */
+        
+        .stats-grid {
+            display: grid;             /* CSS Grid layout */
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            /* Responsive columns with 250px minimum:
+               - Smaller minimum allows more columns on medium screens
+               - auto-fit creates optimal number of columns */
+            gap: 3rem;                /* Large gap between items (48px) */
+            text-align: center;       /* Centers all text within grid items */
+        }
+
+        /* ==============================================================================
+           INDIVIDUAL STATISTIC ITEM
+           ==============================================================================
+           
+           Purpose: Container for each metric
+           
+           Animation Note:
+           - Uses same fadeInUp animation as other elements
+           - JavaScript intersection observer triggers animation on scroll
+           ============================================================================== */
+        
+        .stat-item {
+            animation: fadeInUp 1s ease-out both; /* Entrance animation
+                                                    'both' maintains final state */
+        }
+
+        /* ==============================================================================
+           STATISTIC NUMBER
+           ==============================================================================
+           
+           Purpose: Large, prominent display of metric value
+           
+           Visual Hierarchy:
+           - Largest text in section draws immediate attention
+           - Glow effect emphasizes importance
+           - Heavy weight creates strong presence
+           ============================================================================== */
+        
+        .stat-number {
+            /* Typography */
+            font-family: 'Orbitron', sans-serif; /* Display font for numbers */
+            font-size: 4rem;           /* Very large size (64px) */
+            font-weight: 900;          /* Maximum weight */
+            
+            /* Color & Effects */
+            color: var(--primary);     /* Brand green */
+            text-shadow: 0 0 20px var(--glow); /* Glowing halo effect */
+            
+            /* Display */
+            display: block;            /* Forces line break after number */
+            
+            /* Spacing */
+            margin-bottom: 1rem;       /* Space before label (16px) */
+        }
+
+        /* ==============================================================================
+           STATISTIC LABEL
+           ==============================================================================
+           
+           Purpose: Descriptive text for statistic
+           
+           Design Choices:
+           - Uppercase and wide letter-spacing create uniformity
+           - Medium size balances with large number
+           - Standard text color provides contrast with number
+           ============================================================================== */
+        
+        .stat-label {
+            /* Typography */
+            font-size: 1.2rem;         /* Medium size (19.2px) */
+            text-transform: uppercase; /* All caps */
+            letter-spacing: 2px;       /* Wide spacing */
+            
+            /* Color */
+            color: var(--text);        /* Standard text color */
+        }
+
+        /* ==============================================================================
+           CONTACT SECTION
+           ==============================================================================
+           
+           Purpose: Call-to-action section for user contact
+           
+           Layout:
+           - Large padding creates section prominence
+           - Gradient background adds visual interest
+           - Centered content creates focus
+           ============================================================================== */
+        
+        .contact {
+            /* Spacing */
+            padding: 8rem 0;          /* Large vertical padding (128px) */
+            
+            /* Background */
+            background: linear-gradient(180deg, var(--dark) 0%, var(--darker) 100%); 
+            /* Gradient from lighter to darker:
+               - Mirrors services section but inverted
+               - Creates visual bookend effect */
+        }
+
+        /* ==============================================================================
+           CONTACT CONTENT CONTAINER
+           ==============================================================================
+           
+           Purpose: Constrains contact content width
+           
+           Centered Layout:
+           - max-width prevents content from getting too wide
+           - margin: 0 auto centers horizontally
+           - text-align centers all text and inline elements
+           ============================================================================== */
+        
+        .contact-content {
+            max-width: 600px;         /* Narrower than hero for focused appearance */
+            margin: 0 auto;           /* Horizontal centering */
+            text-align: center;       /* Centers text and inline elements */
+        }
+
+        /* ==============================================================================
+           CONTACT DESCRIPTION
+           ==============================================================================
+           
+           Purpose: Contextual text before CTA button
+           
+           Typography:
+           - Large size emphasizes importance
+           - Generous margins create space around text
+           - Increased line-height ensures readability
+           ============================================================================== */
+        
+        .contact-content p {
+            /* Typography */
+            font-size: 1.3rem;        /* Large size (20.8px) */
+            line-height: 1.8;         /* Generous line spacing */
+            
+            /* Spacing */
+            margin-bottom: 3rem;      /* Large space before button (48px) */
+        }
+
+        /* ==============================================================================
+           CONTACT INFO CONTAINER
+           ==============================================================================
+           
+           Purpose: Layout container for contact elements
+           
+           Flexbox Layout:
+           - Column direction stacks elements vertically
+           - Gap provides consistent spacing
+           - align-items centers all child elements
+           ============================================================================== */
+        
+        .contact-info {
+            display: flex;            /* Flexbox layout */
+            flex-direction: column;   /* Vertical stacking */
+            gap: 1.5rem;             /* Space between elements (24px) */
+            align-items: center;      /* Horizontal centering of items */
+        }
+
+        /* ==============================================================================
+           FOOTER COMPONENT
+           ==============================================================================
+           
+           Purpose: Site footer with copyright information
+           
+           Design Elements:
+           - Border and glow match header for visual consistency
+           - Semi-transparent background maintains glassmorphism theme
+           - Centered text creates clean, professional appearance
+           ============================================================================== */
+        
+        footer {
+            /* Spacing */
+            padding: 3rem 0;          /* Vertical padding (48px) */
+            
+            /* Layout */
+            text-align: center;       /* Centers all text */
+            
+            /* Visual Effects */
+            border-top: 2px solid var(--primary); /* Top border with brand color */
+            box-shadow: 0 0 20px var(--glow);    /* Glowing effect */
+            background: rgba(10, 14, 39, 0.8);   /* Semi-transparent background */
+        }
+
+        /* ==============================================================================
+           FOOTER TEXT
+           ==============================================================================
+           
+           Purpose: Copyright and branding text
+           ============================================================================== */
+        
+        footer p {
+            color: var(--text);       /* Standard text color */
+        }
+
+        /* ==============================================================================
+           RESPONSIVE DESIGN - MOBILE BREAKPOINT
+           ==============================================================================
+           
+           Purpose: Optimizes layout for mobile devices
+           
+           Breakpoint: 768px
+           - Common tablet/mobile breakpoint
+           - Adjusts typography and layout for smaller screens
+           
+           Changes:
+           - Reduces font sizes to fit smaller screens
+           - Adjusts spacing for touch targets
+           - Simplifies grid to single column
+           ============================================================================== */
+        
+        @media (max-width: 768px) {
+            /**
+             * MOBILE: Hero Headline
+             * Reduces from 4.5rem (72px) to 2.5rem (40px)
+             * Prevents headline from dominating small screen
+             */
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            /**
+             * MOBILE: Terminal Text
+             * Reduces from 1.5rem (24px) to 1.2rem (19.2px)
+             * Maintains readability while saving space
+             */
+            .terminal-text {
+                font-size: 1.2rem;
+            }
+
+            /**
+             * MOBILE: Navigation Links
+             * Reduces gap from 2.5rem (40px) to 1.5rem (24px)
+             * Prevents menu from wrapping unnecessarily
+             */
+            .nav-links {
+                gap: 1.5rem;
+            }
+
+            /**
+             * MOBILE: Section Titles
+             * Reduces from 3rem (48px) to 2rem (32px)
+             * Better proportion for mobile screens
+             */
+            .section-title {
+                font-size: 2rem;
+            }
+
+            /**
+             * MOBILE: Services Grid
+             * Forces single column layout
+             * Easier reading and navigation on mobile
+             * Prevents cards from becoming too narrow
+             */
+            .services-grid {
+                grid-template-columns: 1fr; /* Single column layout */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================================================================================
+         BACKGROUND EFFECTS LAYER
+         ==================================================================================
+         
+         Purpose: Decorative animated backgrounds
+         
+         Implementation Notes:
+         - Fixed positioning keeps them in place during scroll
+         - Low z-index ensures they stay behind content
+         - pointer-events: none allows interaction with content above
+         ================================================================================== -->
+    
+    <!-- Animated grid background - creates cyberpunk aesthetic -->
+    <div class="grid-bg"></div>
+    
+    <!-- Scanline effect - simulates CRT monitor -->
+    <div class="scanline"></div>
+
+    <!-- ==================================================================================
+         HEADER SECTION
+         ==================================================================================
+         
+         Purpose: Main navigation and branding
+         
+         Features:
+         - Sticky positioning keeps navigation accessible
+         - Responsive flexbox layout
+         - Glassmorphism effect with backdrop blur
+         ================================================================================== -->
+    
+    <header>
+        <div class="container">
+            <nav>
+                <!-- Brand Logo - Links to home (could be added) -->
+                <div class="logo">OFFENSIVE_CORE</div>
+                
+                <!-- Primary Navigation Menu -->
+                <ul class="nav-links">
+                    <!-- Services link - smooth scrolls to #servicios section -->
+                    <li><a href="#servicios">Servicios</a></li>
+                    
+                    <!-- About link - currently no corresponding section -->
+                    <li><a href="#nosotros">Nosotros</a></li>
+                    
+                    <!-- Contact link - smooth scrolls to #contacto section -->
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ==================================================================================
+         HERO SECTION (Above-the-fold content)
+         ==================================================================================
+         
+         Purpose: Primary landing section with key messaging and CTA
+         
+         Content Hierarchy:
+         1. Main headline (H1)
+         2. Terminal-style subheading
+         3. Value proposition paragraph
+         4. Call-to-action button
+         
+         All elements use staggered animations for polished entrance
+         ================================================================================== -->
+    
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <!-- Main headline - Split across two lines for visual impact -->
+                <h1>OFFENSIVE<br>CORE</h1>
+                
+                <!-- Terminal-style command line text - reinforces tech aesthetic -->
+                <div class="terminal-text">initialize security_protocol.exe</div>
+                
+                <!-- Value proposition - explains service offering -->
+                <p>Expertos en ciberseguridad ofensiva. Protegemos tu infraestructura digital mediante pentesting avanzado, análisis de vulnerabilidades y estrategias de defensa proactiva.</p>
+                
+                <!-- Primary CTA - directs to contact section -->
+                <a href="#contacto" class="cta-button">Iniciar Auditoría</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================================
+         SERVICES SECTION
+         ==================================================================================
+         
+         Purpose: Showcases company service offerings
+         
+         Structure:
+         - Section title with code comment styling
+         - Responsive grid of service cards
+         - 6 distinct services displayed
+         
+         Each card includes:
+         - Service name (H3)
+         - Detailed description
+         - Hover effects for interactivity
+         ================================================================================== -->
+    
+    <section id="servicios" class="services">
+        <div class="container">
+            <!-- Section heading with developer-style comment prefix -->
+            <h2 class="section-title">// Servicios</h2>
+            
+            <!-- Responsive grid container - auto-adapts to screen size -->
+            <div class="services-grid">
+                
+                <!-- Service Card 1: Penetration Testing -->
+                <div class="service-card">
+                    <h3>Penetration Testing</h3>
+                    <p>Simulamos ataques reales contra tu infraestructura para identificar vulnerabilidades antes que los atacantes. Metodologías OWASP, PTES y frameworks personalizados.</p>
+                </div>
+
+                <!-- Service Card 2: Red Team Operations -->
+                <div class="service-card">
+                    <h3>Red Team Operations</h3>
+                    <p>Operaciones avanzadas de red team que evalúan tu capacidad de detección y respuesta ante amenazas persistentes avanzadas (APT).</p>
+                </div>
+
+                <!-- Service Card 3: Vulnerability Assessment -->
+                <div class="service-card">
+                    <h3>Vulnerability Assessment</h3>
+                    <p>Análisis exhaustivo de vulnerabilidades en aplicaciones web, móviles, APIs y infraestructura cloud. Reportes detallados con remediation roadmap.</p>
+                </div>
+
+                <!-- Service Card 4: Security Code Review -->
+                <div class="service-card">
+                    <h3>Security Code Review</h3>
+                    <p>Revisión profunda de código fuente para identificar vulnerabilidades de seguridad, malas prácticas y vectores de ataque potenciales.</p>
+                </div>
+
+                <!-- Service Card 5: Web Application Security -->
+                <div class="service-card">
+                    <h3>Web Application Security</h3>
+                    <p>Testing especializado en aplicaciones web: SQL injection, XSS, CSRF, broken authentication y toda la OWASP Top 10.</p>
+                </div>
+
+                <!-- Service Card 6: Mobile App Security -->
+                <div class="service-card">
+                    <h3>Mobile App Security</h3>
+                    <p>Auditorías de seguridad para aplicaciones iOS y Android. Reverse engineering, análisis de tráfico y pruebas de seguridad en tiempo de ejecución.</p>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================================
+         STATISTICS SECTION
+         ==================================================================================
+         
+         Purpose: Displays key performance metrics and achievements
+         
+         Metrics Displayed:
+         1. Total audits completed (780+)
+         2. Vulnerabilities detected (55K+)
+         3. Client satisfaction rate (98%)
+         4. Support availability (24 hours)
+         
+         Design Pattern:
+         - Large numbers draw attention
+         - Descriptive labels provide context
+         - Grid layout ensures balance
+         - Animations triggered by scroll (via JavaScript)
+         ================================================================================== -->
+    
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                
+                <!-- Statistic 1: Completed Audits -->
+                <div class="stat-item">
+                    <span class="stat-number">780+</span>
+                    <span class="stat-label">Auditorías Realizadas</span>
+                </div>
+                
+                <!-- Statistic 2: Detected Vulnerabilities -->
+                <div class="stat-item">
+                    <span class="stat-number">55K+</span>
+                    <span class="stat-label">Vulnerabilidades Detectadas</span>
+                </div>
+                
+                <!-- Statistic 3: Customer Satisfaction -->
+                <div class="stat-item">
+                    <span class="stat-number">98%</span>
+                    <span class="stat-label">Satisfacción del Cliente</span>
+                </div>
+                
+                <!-- Statistic 4: Support Availability -->
+                <div class="stat-item">
+                    <span class="stat-number">24 hrs</span>
+                    <span class="stat-label">Soporte Continuo</span>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================================
+         CONTACT SECTION
+         ==================================================================================
+         
+         Purpose: Final call-to-action for user engagement
+         
+         Structure:
+         - Section title with code comment
+         - Persuasive text encouraging contact
+         - CTA button linking to external contact page
+         
+         Note: Button links to placeholder URL - should be updated with actual contact page
+         ================================================================================== -->
+    
+    <section id="contacto" class="contact">
+        <div class="container">
+            <div class="contact-content">
+                <!-- Section heading -->
+                <h2 class="section-title">// Contacto</h2>
+                
+                <!-- Persuasive text encouraging user action -->
+                <p>¿Listo para fortalecer tu seguridad digital? Contáctanos y descubre cómo podemos proteger tu infraestructura.</p>
+                
+                <div class="contact-info">
+                    <!-- CTA button - links to external contact page -->
+                    <a href="IA_pagina/IA.html" class="cta-button">Contáctanos Ahora</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================================
+         FOOTER SECTION
+         ==================================================================================
+         
+         Purpose: Site footer with copyright and legal information
+         
+         Content:
+         - Copyright notice (© 2015)
+         - Company name
+         - Tagline
+         ================================================================================== -->
+    
+    <footer>
+        <div class="container">
+            <!-- Copyright and branding information -->
+            <p>&copy; 2015 Offensive Core. Todos los derechos reservados. | Ciberseguridad Ofensiva de Élite</p>
+        </div>
+    </footer>
+
+    <!-- ==================================================================================
+         JAVASCRIPT - INTERACTIVE FUNCTIONALITY
+         ==================================================================================
+         
+         Purpose: Adds dynamic behavior and animations
+         
+         Functionality Implemented:
+         1. Smooth scrolling for anchor links
+         2. Scroll-triggered animations using Intersection Observer API
+         
+         Performance Notes:
+         - Uses modern APIs (Intersection Observer) for efficiency
+         - Minimal DOM manipulation
+         - Event delegation where applicable
+         ================================================================================== -->
+    
+    <script>
+        /* ==============================================================================
+           SMOOTH SCROLL FUNCTIONALITY
+           ==============================================================================
+           
+           Purpose: Provides smooth scrolling when clicking navigation links
+           
+           Implementation:
+           1. Selects all links starting with "#" (anchor links)
+           2. Prevents default jump behavior
+           3. Smoothly scrolls to target section
+           
+           Benefits:
+           - Enhanced user experience
+           - Professional feel
+           - Better than instant jumps
+           
+           Browser Support: Modern browsers (IE11+ with polyfill)
+           ============================================================================== */
+        
+        // Select all anchor links (links starting with "#")
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            
+            // Add click event listener to each anchor link
+            anchor.addEventListener('click', function (e) {
+                
+                // Prevent default link behavior (instant jump to section)
+                e.preventDefault();
+                
+                // Get the target element using the href attribute value
+                // this.getAttribute('href') returns "#servicios", "#contacto", etc.
+                const target = document.querySelector(this.getAttribute('href'));
+                
+                // Check if target element exists (prevents errors if section not found)
+                if (target) {
+                    // Smoothly scroll to target element
+                    target.scrollIntoView({ 
+                        behavior: 'smooth',  // Smooth scrolling animation
+                        block: 'start'       // Aligns target to top of viewport
+                    });
+                }
+            });
+        });
+
+        /* ==============================================================================
+           INTERSECTION OBSERVER - SCROLL-TRIGGERED ANIMATIONS
+           ==============================================================================
+           
+           Purpose: Triggers animations when elements enter viewport
+           
+           How It Works:
+           1. Observer watches specified elements
+           2. When element becomes visible (intersects viewport), triggers animation
+           3. Animation is CSS-based (opacity and transform changes)
+           
+           Benefits:
+           - More performant than scroll event listeners
+           - Native browser API (no library needed)
+           - Handles complex visibility calculations automatically
+           
+           Performance Impact: Low - uses browser's native implementation
+           ============================================================================== */
+        
+        /**
+         * Observer Configuration Object
+         * 
+         * threshold: 0.2
+         * - Callback triggers when 20% of element is visible
+         * - Lower values (0.1) trigger earlier
+         * - Higher values (0.5) require more visibility
+         * 
+         * rootMargin: '0px 0px -100px 0px'
+         * - Expands or shrinks the viewport for intersection calculation
+         * - Format: top right bottom left (like CSS margin)
+         * - -100px bottom means: trigger 100px before element enters viewport
+         * - Creates "head start" effect for smoother animations
+         */
+        const observerOptions = {
+            threshold: 0.2,        // Element must be 20% visible to trigger
+            rootMargin: '0px 0px -100px 0px' // Triggers 100px before element reaches viewport bottom
+        };
+
+        /**
+         * Create Intersection Observer Instance
+         * 
+         * Callback function executed when observed elements intersect viewport
+         * 
+         * @param {IntersectionObserverEntry[]} entries - Array of observed elements
+         */
+        const observer = new IntersectionObserver((entries) => {
+            
+            // Iterate through each observed element
+            entries.forEach(entry => {
+                
+                // Check if element is intersecting (visible in viewport)
+                if (entry.isIntersecting) {
+                    
+                    // Make element visible by changing CSS properties
+                    // These changes trigger CSS transitions defined in styles
+                    entry.target.style.opacity = '1';          // Fade in (from 0 to 1)
+                    entry.target.style.transform = 'translateY(0)'; // Move to natural position (from 40px down)
+                    
+                    /* Note: Could optionally unobserve after animation:
+                       observer.unobserve(entry.target);
+                       This would prevent animation from re-triggering
+                       Currently, animation can re-trigger if user scrolls up and down */
+                }
+            });
+        }, observerOptions);
+
+        /* ==============================================================================
+           APPLY OBSERVER TO ELEMENTS
+           ==============================================================================
+           
+           Purpose: Set up initial state and observe elements for animation
+           
+           Process:
+           1. Select all elements to animate
+           2. Set initial CSS state (invisible, moved down)
+           3. Define transition properties
+           4. Start observing each element
+           
+           Elements Animated:
+           - .service-card (all service cards in grid)
+           - .stat-item (all statistics)
+           ============================================================================== */
+        
+        // Select all service cards and statistic items
+        document.querySelectorAll('.service-card, .stat-item').forEach(el => {
+            
+            /* Set Initial Animation State
+               These styles make elements invisible and positioned below their final location
+               Creates starting point for animation */
+            
+            el.style.opacity = '0';              // Start invisible
+            el.style.transform = 'translateY(40px)'; // Start 40px below final position
+            
+            /* Define CSS Transitions
+               Specifies how opacity and transform should animate
+               When these properties change, they animate smoothly */
+            
+            el.style.transition = 'opacity 0.8s, transform 0.8s'; 
+            // 0.8s = 800ms animation duration
+            // Both properties animate simultaneously
+            
+            /* Start Observing Element
+               Tells Intersection Observer to watch this element
+               When element enters viewport, observer callback triggers
+               Callback changes opacity to 1 and transform to translateY(0)
+               Transition property makes these changes animate smoothly */
+            
+            observer.observe(el);
+        });
+        
+        /* ==============================================================================
+           ANIMATION FLOW SUMMARY
+           ==============================================================================
+           
+           1. Page loads → Elements are invisible and positioned 40px down
+           2. User scrolls → Intersection Observer detects when elements enter viewport
+           3. Observer callback triggers → Changes opacity to 1 and transform to translateY(0)
+           4. CSS transitions animate → Smooth 0.8s animation from invisible/down to visible/normal
+           
+           Result: Professional staggered entrance animations as user scrolls
+           ============================================================================== */
+    </script>
+</body>
+</html>
