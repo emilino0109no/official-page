@@ -6,3 +6,6 @@ This repository contains the source code for the Offensive Core website. Below i
 <p>└── IA_pagina</p>
 <p>    └── IA.html</p></center>
 
+The documentation for each code snippet is included in the same file.
+
+Important: Implement every modification in the test module.
